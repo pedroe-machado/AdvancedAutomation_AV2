@@ -1,0 +1,20 @@
+{
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "github.codespaces.defaultExtensions": [
+        "GitHub.codespaces",
+        "GitHub.vscode-pull-request-github"
+    ],
+    "java.compile.nullAnalysis.nonnull": [
+
+        "javax.annotation.Nonnull",
+        "org.eclipse.jdt.annotation.NonNull",
+        "org.springframework.lang.NonNull"
+    ],
+    "java.configuration.runtimes": [
+          {
+            "name": "JavaSE-20",
+            "path": "C:\\Program Files\\Java\\jdk-20\\jdk-20",
+            "default": true
+          },
+    ]
+}
