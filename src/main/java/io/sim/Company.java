@@ -1,12 +1,7 @@
 package io.sim;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -52,6 +47,7 @@ public class Company extends Thread{
         this.drivers = new ArrayList<Driver>();
 
         this.start();
+        System.out.println("Company iniciado");
     }
     
     @Override
@@ -67,11 +63,15 @@ public class Company extends Thread{
         }
         for (int i = 0; i < 1; i++) { // Contratação de Drivers e cadastro de novos carros
             try {
-                Car newCar = new Car(true, Integer.toString(i), new SumoColor(0, 255, 0, 126), Integer.toString(i), sumo,
+                Car newCar = new Car(true, Integer.toString(i)+"0", new SumoColor(0, 255, 0, 126), Integer.toString(i), sumo,
                         500, 2, 2, 5.87, 5, 1);
                 carrosFirma.add(i, newCar);
-                Driver newDriver = new Driver(sumo, Integer.toString(i), newCar);
+                System.out.println("Carro " + Integer.toString(i)+"0" + " contratado.");
+
+                Driver newDriver = new Driver(sumo, Integer.toString(i)+"0", newCar);
                 drivers.add(i, newDriver);
+                System.out.println("Driver " + Integer.toString(i)+"0" + " contratado.");
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -80,7 +80,11 @@ public class Company extends Thread{
 
         for (int i = 0; i <= carrosFirma.size()-1; i++) {
             carrosFirma.get(i).start();
+            System.out.println("Carro " + Integer.toString(i)+"0" + " iniciado.");
+
             drivers.get(i).start();
+            System.out.println("Driver " + Integer.toString(i)+"0" + " iniciado.");
+            
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
@@ -101,6 +105,7 @@ public class Company extends Thread{
         public void run(){
             this.routes = parseRoutes();
             //limpaXml();
+            System.out.println("Rotas criadas com sucesso.");
         }
         private Queue<Route> parseRoutes() {         
             Queue<Route> routesQueue = new LinkedList<>();
@@ -207,19 +212,21 @@ public class Company extends Thread{
             this.conn = conn;
         }
         @Override
-        protected void ProcessMessage(String jsonString){
-            try {
-                //byte[] decryptedData = CryptoUtils.decrypt(CryptoUtils.getStaticKey(), CryptoUtils.getStaticIV(), jsonString.getBytes("UTF-8"));
-                
-                JSONObject jsonObject = new JSONObject(jsonString);
-
+        protected void ProcessMessage(String messageReceived){
+            try {                               
+                JSONObject jsonObject;
+                if (useEncryption) {
+                    jsonObject = CryptoUtils.decrypt(messageReceived);
+                } else {
+                    jsonObject = new JSONObject(messageReceived);
+                }
                 if (jsonObject.getString("servico").equals("REQUEST_ROUTE")) {
                     new ManageRoute(conn, jsonObject);
                 } else if (jsonObject.getString("servico").equals("SEND_INFO")) {
                     new CalculaKm(jsonObject);
                 }
             } catch (Exception e) {
-                System.out.println(jsonString);
+                System.out.println(messageReceived);
                 e.printStackTrace();
             }
         }

@@ -18,15 +18,12 @@ public class TransportService extends Thread {
 		this.idTransportService = _idTransportService;
 		this.car = car;
 		this.sumo = _sumo;
-		this.start();
 	}
 
 	@Override
 	public void run() {
 		try {
-			
-			this.initializeRoutes();
-
+			this.initializeRoute();
 			while (this.on_off) {
 				Thread.sleep(this.car.getAcquisitionRate());
 				if (this.getSumo().isClosed()) {
@@ -34,16 +31,14 @@ public class TransportService extends Thread {
 					System.out.println("SUMO is closed...");
 				}
 			}
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	private void initializeRoutes() {
+	private void initializeRoute() {
 
 		int attempts = 3;
-
 		while(attempts>0){
 			try {
 				sumo.do_job_set(Route.add(this.car.getCurrenRoute().getId(), this.car.getCurrenRoute().getEdges()));
@@ -69,7 +64,12 @@ public class TransportService extends Thread {
 				break;
 			} catch (Exception e1) {
 				attempts--;
+				System.out.println("Erro ao inicializar rota - tentando novamente");
 			}
+		}
+		if (attempts == 0) {
+			System.out.println("Erro ao inicializar rota - serviço não iniciado");
+			this.on_off = false;
 		}
 	}
 

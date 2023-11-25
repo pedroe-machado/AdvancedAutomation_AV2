@@ -1,8 +1,6 @@
 package io.sim;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
@@ -39,11 +37,6 @@ public class Driver extends Thread{
                 } catch (Exception e) {System.out.println("nehuma rota finalizada");}
                 currentRoute = carro.getCurrenRoute();
                 carro.ackNewRoute();
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
                 currentService = new TransportService(true, idConta, carro, sumo);
                 currentService.start();
                 System.out.println(idDriver + " iniciou nova rota: "+ currentRoute.getId());

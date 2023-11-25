@@ -5,7 +5,6 @@ import de.tudresden.sumo.cmd.Vehicle;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Collection;
 
 import javax.swing.JFrame;
 import javax.swing.Timer;
@@ -80,8 +79,10 @@ public class Auto extends Thread {
 		synchronized(monitor){
 			while(attempt>0){
 				try {
-					if (!this.getSumo().isClosed() && isOn()) {
-						
+					if (!this.getSumo().isClosed()){
+						System.out.println("Sumo is open");
+						if(isOn()){
+						System.out.println("Vehicle exists");
 						SumoPosition2D sumoPosition2D = (SumoPosition2D) sumo.do_job_get(Vehicle.getPosition(this.idAuto));
 						infoDistanceCompany = km.calcular(sumoPosition2D.toString()); //EXIGÊNCIA CALCULO LONG/LAT
 						
@@ -111,8 +112,9 @@ public class Auto extends Thread {
 						monitor.notify();
 						break;
 
+						}
 					} else {
-						System.out.println("SUMO is closed...");
+						System.out.println("Vehicle not added");
 					}
 				} catch (Exception e) {
 					Thread.sleep(20);

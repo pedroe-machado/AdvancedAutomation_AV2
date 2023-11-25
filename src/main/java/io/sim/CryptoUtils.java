@@ -19,7 +19,7 @@ public class CryptoUtils implements Serializable {
     private static final String KEY = "minhakeydecriptografia";
 
     private static SecretKey getKey() {
-        return new SecretKeySpec(KEY.getBytes(), "AES");
+        return new SecretKeySpec(KEY.getBytes(), 0, 16, "AES");
     }
 
     public static String encrypt(JSONObject dado) throws InvalidKeyException, IllegalBlockSizeException,

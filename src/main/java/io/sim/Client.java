@@ -10,8 +10,20 @@ public class Client {
     private Socket socket;
     private OutputStream writer;    
     private InputStream reader;
+    public boolean useEncryption;
 
+    Client(String ip, int port, boolean useEncryption) {
+        this.useEncryption = useEncryption;
+        try {
+            socket = new Socket(ip, port);
+            writer = socket.getOutputStream();            
+            reader = socket.getInputStream();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     Client(String ip, int port) {
+        this.useEncryption = false;
         try {
             socket = new Socket(ip, port);
             writer = socket.getOutputStream();            
@@ -22,19 +34,32 @@ public class Client {
     }
     public void SendMessage(JSONObject jsonObject) {      
         try {
-            byte[] jsonBytes = CryptoUtils.encrypt(jsonObject).getBytes();
-            System.out.println("sentmessage: " + jsonObject.toString());
-            if(jsonBytes!=null){
-                writer.write(jsonBytes);
+            String message = jsonObject.toString();
+            byte[] messageBytes;
+            if (useEncryption) {
+                messageBytes = CryptoUtils.encrypt(jsonObject).getBytes();
+            } else {
+                messageBytes = message.getBytes();
+            }
+            System.out.println("sentmessage: " + message);
+            if(messageBytes!=null){
+                writer.write(messageBytes);
                 writer.flush();
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-    public JSONObject Listen() throws Exception {        
+    public JSONObject Listen() throws Exception {
+        JSONObject jsonObject; 
+
         byte[] message = reader.readAllBytes();        
-        JSONObject jsonObject = new JSONObject(CryptoUtils.decrypt(new String(message)));
+        if (useEncryption) {
+            jsonObject = CryptoUtils.decrypt(new String(message));
+        } else {
+            jsonObject = new JSONObject(new String(message));
+        }
+
         System.out.println("receivedmessage: " + jsonObject.toString());
         return jsonObject;
     }

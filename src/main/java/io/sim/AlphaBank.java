@@ -1,9 +1,6 @@
 package io.sim;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -35,7 +32,7 @@ public class AlphaBank extends Service{
         for (String id : users) {
             accounts.put(id, new Account(id, 1200));
         }
-        this.start();
+        System.out.println("AlphaBank inaugurado");
     }
     @Override
     public Server CreateServerThread(Socket conn){
@@ -57,24 +54,27 @@ public class AlphaBank extends Service{
         private String idConta, senha;
         private String idBeneficiario;
         private double valor;
-        private Socket conn;
 
         public Transferencia(Socket conn) {
             super(conn);
-            this.conn = conn;
         }
 
         @Override
-        protected void ProcessMessage(String jsonString) {
+        protected void ProcessMessage(String messageReceived) {  
             try {
-                if(jsonString.equals("fuelStation")){
-                    fuelStationConection = this;
-                } 
-                JSONObject jsonObject = new JSONObject(CryptoUtils.decrypt(jsonString));
-
+                JSONObject jsonObject;
+                if (useEncryption) {
+                    jsonObject = CryptoUtils.decrypt(messageReceived);
+                } else {
+                    jsonObject = new JSONObject(messageReceived);
+                }
                 this.idConta = jsonObject.getString("idConta");
                 this.senha = jsonObject.getString("senha");
                 this.idBeneficiario = jsonObject.getString("idBeneficiario");
+
+                if(jsonObject.getString("idConta").equals("fuelStation")){
+                    fuelStationConection = this;
+                }                 
                 try {
                     this.valor = jsonObject.getDouble("valor");
                 } catch (JSONException | NullPointerException e) {

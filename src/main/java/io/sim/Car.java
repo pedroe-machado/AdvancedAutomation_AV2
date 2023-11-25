@@ -1,9 +1,6 @@
 package io.sim;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.Socket;
 import java.net.UnknownHostException;
 
 import org.json.JSONObject;
@@ -40,8 +37,14 @@ public class Car extends Thread{
     public void run() {
         try {
             new AskRoute(); //solicita rota e altera currentRoute
-        } catch (UnknownHostException e) {System.out.println("askroute error");}
-        catch (IOException e) {e.printStackTrace();}
+            Thread.sleep(1000);
+        } catch (UnknownHostException e) {
+            System.out.println("askroute error");
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         auto.start();
         while(true){
@@ -109,8 +112,6 @@ public class Car extends Thread{
         public void run() {
             try {
                 clientComp.SendMessage(jsonFlag);
-
-                Thread.sleep(100);
                 
                 JSONObject jsonPackage = clientComp.Listen();
 

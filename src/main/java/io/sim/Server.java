@@ -7,12 +7,21 @@ import java.net.Socket;
 import org.json.JSONObject;
 
 public abstract class Server extends Thread {
-    private Socket conn;
     private InputStream reader;
     private OutputStream writer;
+    public boolean useEncryption;
 
+    public Server(Socket conn, boolean useEncryption) {
+        this.useEncryption = useEncryption;
+        try {
+            reader = conn.getInputStream();
+            writer = conn.getOutputStream();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     public Server(Socket conn) {
-        this.conn = conn;
+        this.useEncryption = false;
         try {
             reader = conn.getInputStream();
             writer = conn.getOutputStream();
@@ -41,9 +50,18 @@ public abstract class Server extends Thread {
 
     public void SendMessage(JSONObject jsonObject) {
         try {
-            String encryptedData = CryptoUtils.encrypt(jsonObject); 
-            writer.write(encryptedData.getBytes());
-            writer.flush();
+            String message = jsonObject.toString();
+            byte[] messageBytes;
+            if (useEncryption) {
+                messageBytes = CryptoUtils.encrypt(jsonObject).getBytes();
+            } else {
+                messageBytes = message.getBytes();
+            }
+            System.out.println("ServerSentmessage: " + message);
+            if(messageBytes!=null){
+                writer.write(messageBytes);
+                writer.flush();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

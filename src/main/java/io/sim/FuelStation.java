@@ -1,9 +1,5 @@
 package io.sim;
 
-import java.net.Socket;
-import java.net.UnknownHostException;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.concurrent.Semaphore;
 
