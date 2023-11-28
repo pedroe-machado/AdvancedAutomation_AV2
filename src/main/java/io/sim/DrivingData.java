@@ -23,7 +23,7 @@ public class DrivingData {
 	private int personNumber;			// the total number of persons which are riding in this vehicle
 	private double co2Emission; 		// in mg/s for the last time step
 	private double HCEmission; 			// in mg/s for the last time step
-
+	private double distanciaCalculada; 	// in m for the last time step
 	/* SEVEN GO Smart Edge's data */
 
 	// Chassis data (VIN)
@@ -139,7 +139,7 @@ public class DrivingData {
 
 			String _autoID, String _driverID, long _timeStamp, double _x_Position, double _y_Position,
 			String _roadIDSUMO, String _routeIDSUMO, double _speed, double _odometer, double _fuelConsumption,
-			double _averageFuelConsumption, int _fuelType, double _fuelPrice, double _co2Emission, double _HCEmission, int _personCapacity, int _personNumber) {
+			double _averageFuelConsumption, int _fuelType, double _fuelPrice, double _co2Emission, double _HCEmission, int _personCapacity, int _personNumber, double distanciaCalculada) {
 
 		this.autoID = _autoID;
 		this.driverID = _autoID;
@@ -160,6 +160,7 @@ public class DrivingData {
 		this.personNumber = _personNumber;
 		this.latL = (40.0) + (_y_Position / 111320.0);
         this.lonL = (-75.0) + (_x_Position / (111320.0 * Math.cos(40.0 * (Math.PI / 180.0))));
+		this.distanciaCalculada = distanciaCalculada;
 
 	}
 
@@ -242,5 +243,9 @@ public class DrivingData {
 	public void setAverageFuelConsumption(double _averageFuelConsumption) {
 		this.averageFuelConsumption = _averageFuelConsumption;
 	}
+
+	public double getDistanciaCalculada() {
+		return this.distanciaCalculada;
+	}	
 
 }
