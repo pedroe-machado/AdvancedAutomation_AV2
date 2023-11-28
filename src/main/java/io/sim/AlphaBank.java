@@ -30,7 +30,7 @@ public class AlphaBank extends Service{
         super(20180);
         accounts = new HashMap<>();
         for (String id : users) {
-            accounts.put(id, new Account(id, 1200));
+            accounts.put(id, new Account(id, 0));
         }
         System.out.println("AlphaBank inaugurado");
     }
@@ -57,6 +57,7 @@ public class AlphaBank extends Service{
 
         public Transferencia(Socket conn) {
             super(conn);
+            System.out.println("Transferencia iniciada");
         }
 
         @Override
@@ -89,16 +90,18 @@ public class AlphaBank extends Service{
             } finally {
                 getAccount(idConta, senha).debita(valor);
                 transferePara(idBeneficiario, valor);
+                System.out.println("Transferencia de " + idConta + " para " + idBeneficiario + " no valor de " + valor + "- saldo: " + getAccount(idBeneficiario, idBeneficiario).getSaldo());
             }
         }
     }
     
+    @SuppressWarnings("unused")
     private class Account{
         private String idConta;
         private String senha;
         private double saldo;
         private boolean autenticado;
-    
+        
         public Account(String idConta, double saldo){
             this.idConta = this.senha = idConta;
             this.saldo = saldo;

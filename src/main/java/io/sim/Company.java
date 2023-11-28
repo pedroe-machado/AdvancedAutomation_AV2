@@ -64,7 +64,7 @@ public class Company extends Thread{
         for (int i = 0; i < 1; i++) { // Contratação de Drivers e cadastro de novos carros
             try {
                 Car newCar = new Car(true, Integer.toString(i)+"0", new SumoColor(0, 255, 0, 126), Integer.toString(i), sumo,
-                        500, 2, 2, 5.87, 5, 1);
+                        1000, 2, 2, 5.87, 5, 1);
                 carrosFirma.add(i, newCar);
                 System.out.println("Carro " + Integer.toString(i)+"0" + " contratado.");
 
@@ -262,7 +262,8 @@ public class Company extends Thread{
                 Route auxRoute = getRoutesAccess().poll();
                 System.out.println(Integer.parseInt(auxRoute.getId()) + " ! " + getRunningAccess().size());
                 getRunningAccess().add(Integer.parseInt(auxRoute.getId()), auxRoute);
-                this.jsonRoute.put("rota",auxRoute);
+                this.jsonRoute.put("idRota",auxRoute.getId());
+                this.jsonRoute.put("edges", auxRoute.getEdges());
                 if(resumedRoute){
                     getFinishedAccess().add(Integer.parseInt(routeFinalizada.getId()),routeFinalizada);
                 }
@@ -271,7 +272,12 @@ public class Company extends Thread{
             }
         }
         @Override
-        public void run(){
+        public void run() {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             reorganize();
             SendMessage(jsonRoute);
         }
@@ -292,14 +298,19 @@ public class Company extends Thread{
         public CalculaKm(JSONObject jsonObject){
             controlMap = getInstanciaMapa();
             idAuto = jsonObject.getString("idAuto");
-            
+            if(controlMap.isEmpty()){
+                System.out.println("mapa vazio");
+                controlMap.put(idAuto,0.0);
+            }
             try {
-                double newDistancia = (Double)(jsonObject.get("km"));
+                double newDistancia = Double.valueOf((String)jsonObject.get("km"));
+                //System.out.println("->"+newDistancia);
                 attMap(idAuto, newDistancia);
                 this.start();
             } catch (NullPointerException e) {
                 System.out.println("error mapa de distancias");
             } catch (ClassCastException e){
+                e.printStackTrace();
             }
         }
         private synchronized HashMap<String,Double> getInstanciaMapa() {
@@ -309,14 +320,14 @@ public class Company extends Thread{
             return controlMap;
         }
         private synchronized void attMap(String idAuto, double newDistance){
-            System.out.println("atualizando mapa:"+ idAuto + " " + distance );
             distance = controlMap.get(idAuto);
             distance += newDistance;
             controlMap.put(idAuto,distance);
+            System.out.println("atualizacao mapa:"+ idAuto + " " + distance);
         }
         @Override
         public void run(){
-            if(distance>=1000){
+            if(distance>=10){
                 try {
                     new BotPayment(idAuto);
                     controlMap.put(idAuto,0.0);
@@ -337,8 +348,13 @@ public class Company extends Thread{
         private Client client;
         private JSONObject jsonObject;
 
-        public BotPayment(String idDriver) throws UnknownHostException, IOException{
-            this.client = new Client("127.0.0.1", 20180);
+        public BotPayment(String idDriver)throws UnknownHostException, IOException{
+            try {
+                this.client = new Client("127.0.0.1", 20180);
+                System.out.println("BotPayment conectado");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             this.jsonObject = new JSONObject();
             this.jsonObject.put("idConta", "company");
             this.jsonObject.put("senha", "company");
