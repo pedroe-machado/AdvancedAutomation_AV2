@@ -3,6 +3,7 @@ package io.sim;
 import java.io.IOException;
 import java.net.UnknownHostException;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import de.tudresden.sumo.cmd.Vehicle;
@@ -35,6 +36,7 @@ public class Car extends Thread{
     
     @Override
     public void run() {
+        System.out.println("carro iniciou em "+ System.currentTimeMillis());
         try {
             new AskRoute(); //solicita rota e altera currentRoute
             Thread.sleep(1000);
@@ -115,11 +117,17 @@ public class Car extends Thread{
                 
                 JSONObject jsonPackage = clientComp.Listen();
 
-                this.newRoute = new Route(jsonPackage.getString("idRota"),(SumoStringList) jsonPackage.get("edges"));
-                System.out.println(jsonPackage.getString("idRota")+jsonPackage.get("edges"));
+                JSONArray jsonArray = jsonPackage.getJSONArray("edges");
+                SumoStringList sumoStringList = new SumoStringList();
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    sumoStringList.add(jsonArray.getString(i));
+                }
+                this.newRoute = new Route(jsonPackage.getString("idRota"),sumoStringList);
+                System.out.println(jsonPackage.getString("idRota") + " rota recebida");
 
                 currentRoute = newRoute;
                 theresNewRoute = true;
+                System.out.println("nova rota "+theresNewRoute);
             } catch (Exception e) {
                 System.out.println("aksroute com problema");
                 e.printStackTrace();
@@ -147,7 +155,7 @@ public class Car extends Thread{
         public void run() {
             if(auto.isOn_off()){
                 try {
-                    System.out.println("car sending: " + jsonPack.toString());                
+                    //System.out.println("car sending: " + jsonPack.toString());                
                     infoClient.SendMessage(jsonPack);
                 } catch (Exception e){
                     System.out.println("sendinfo timing error");

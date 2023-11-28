@@ -19,10 +19,11 @@ public class Simulation extends Thread{
 		String sumo_bin = "sumo-gui";		
 		String config_file = "map/map.sumo.cfg";
 		this.sumo = new SumoTraciConnection(sumo_bin, config_file);
-		sumo.addOption("start", "1"); // auto-run on GUI show
-		sumo.addOption("quit-on-end", "1"); // auto-close on end
+		this.sumo.addOption("start", "1"); // auto-run on GUI show
+		this.sumo.addOption("quit-on-end", "1"); // auto-close on end
 		try {
-			sumo.runServer(25000);
+			this.sumo.runServer(12345);
+			System.out.println("SUMO iniciado na porta 12345");
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.out.println("Erro ao iniciar SUMO");
@@ -32,7 +33,10 @@ public class Simulation extends Thread{
 
 	public void run() {
 		try {
-			while(sumo.isClosed());
+			while(this.sumo.isClosed()){
+				System.out.println("SUMO não iniciado");
+				Thread.sleep(100);
+			};
 
 			ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
         	scheduler.scheduleAtFixedRate(new PeriodicTask(), 1000, 500, TimeUnit.MILLISECONDS);

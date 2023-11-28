@@ -46,7 +46,7 @@ public class TransportService extends Thread {
 				sumo.do_job_set(Vehicle.addFull(this.car.getIdAuto(), 				//vehID
 												this.car.getCurrenRoute().getId(), 	//routeID 
 												"DEFAULT_VEHTYPE", 					//typeID 
-												"now", 								//depart  
+												"begin", 								//depart  
 												"0", 								//departLane 
 												"0", 								//departPos 
 												"0",								//departSpeed
@@ -61,6 +61,7 @@ public class TransportService extends Thread {
 						);
 				
 				sumo.do_job_set(Vehicle.setColor(this.car.getIdAuto(), this.car.getColorAuto()));
+				System.out.println("Vehicle " + this.car.getIdAuto() + " initialized at time: " + System.currentTimeMillis());
 				break;
 			} catch (Exception e1) {
 				attempts--;

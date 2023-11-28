@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import org.json.JSONObject;
 
 import it.polito.appeal.traci.SumoTraciConnection;
-
+@SuppressWarnings("unused")
 public class Driver extends Thread{  
     private String idDriver;
     private String idConta;
@@ -29,25 +29,30 @@ public class Driver extends Thread{
 
     @Override
     public void run() {
+        System.out.println("driver iniciou em "+ System.currentTimeMillis());
         while (carro.isAlive()) {
+            //System.out.println("carro vivo");
             if(carro.theresNewRoute()){
                 try {
                     done.add(Integer.parseInt(currentRoute.getId()), currentRoute); //adiciona rota finalizada
                     currentService.setOn(false);
-                } catch (Exception e) {System.out.println("nehuma rota finalizada");}
+                } catch (Exception e) {
+                    System.out.println("nehuma rota finalizada");
+                }
                 currentRoute = carro.getCurrenRoute();
                 carro.ackNewRoute();
                 currentService = new TransportService(true, idConta, carro, sumo);
                 currentService.start();
                 System.out.println(idDriver + " iniciou nova rota: "+ currentRoute.getId());
             }
-            while (!carro.doesNeedFuel() && !carro.theresNewRoute()) {
-                try {
-                    carro.sincronizaWaitCar();
-                } catch (Exception e) {
-                    System.out.println("driver sleep error");
-                }
-            }
+            // while (!carro.doesNeedFuel() && !carro.theresNewRoute()) {
+            //     try {
+            //         System.out.println("esperando sincronia");
+            //         carro.sincronizaWaitCar();
+            //     } catch (Exception e) {
+            //         System.out.println("driver sleep error");
+            //     }
+            // }
             try {
                 if(carro.doesNeedFuel() && !carro.abastecendo()){
                     carro.abastecendo(true);
