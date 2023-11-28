@@ -23,7 +23,7 @@
 //     public void run() {
 //         try {
 //             InputStream input = clientSocket.getInputStream();
-//             byte[] encryptedData = input.readAllBytes();
+            // byte[] encryptedData = input.readAllBytes();
 
 //             // Descriptografa os dados
 //             byte[] decryptedData = CryptoUtils.decrypt(key, iv, encryptedData);

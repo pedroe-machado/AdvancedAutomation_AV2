@@ -41,7 +41,7 @@ public class Client {
             } else {
                 messageBytes = message.getBytes();
             }
-            System.out.println("sentmessage: " + message);
+            System.out.println("ClientSentMessage: " + message);
             if(messageBytes!=null){
                 writer.write(messageBytes);
                 writer.flush();
@@ -51,18 +51,24 @@ public class Client {
         }
     }
     public JSONObject Listen() throws Exception {
-        JSONObject jsonObject; 
-
-        byte[] message = reader.readAllBytes();        
-        if (useEncryption) {
-            jsonObject = CryptoUtils.decrypt(new String(message));
-        } else {
-            jsonObject = new JSONObject(new String(message));
+        JSONObject jsonObject = null;
+        System.out.println("listening");
+        byte[] buffer = new byte[1024];
+        int bytesRead = reader.read(buffer);
+        if (bytesRead > 0) {
+            byte[] messageBytes = new byte[bytesRead];
+            System.arraycopy(buffer, 0, messageBytes, 0, bytesRead);
+            String message = new String(messageBytes);
+            if (useEncryption) {
+                jsonObject = CryptoUtils.decrypt(message);
+            } else {
+                jsonObject = new JSONObject(message);
+            }
+            System.out.println("receivedmessage: " + message + " " + jsonObject.toString());
         }
-
-        System.out.println("receivedmessage: " + jsonObject.toString());
         return jsonObject;
     }
+
     public void Close() throws IOException {
         socket.close();
     }
