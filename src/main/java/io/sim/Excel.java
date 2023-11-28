@@ -2,83 +2,101 @@ package io.sim;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.concurrent.Semaphore;
 
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-public class Excel extends Thread{
+public class Excel {
+    private static boolean singleExcel=false;
+    private static final Semaphore semaphore = new Semaphore(1);
+    private static final String fileName = "C:\\Users\\Usuario\\OneDrive\\Documentos\\UFLA\\11 periodo\\AutomacaoAvancada\\AdvancedAutomation_AV2\\data\\Relatorio.xlsx";
+    private static XSSFWorkbook workbook = new XSSFWorkbook();
 
-    private static final String fileName = "C:\\Users\\Usuario\\OneDrive\\Documentos\\UFLA\\11 periodo\\AutomacaoAvancada\\AdvancedAutomation_AV2\\data\\Relatorio.xls";
-    private static XSSFWorkbook workbook;
-    private Sheet sheet;
-    private DrivingData repport;
-
-    public Excel(DrivingData repport){
-        this.repport = repport;
-        workbook = new XSSFWorkbook();
-        this.start();
-    }
-
-    @Override
-    public void run(){
-
-        try {
-            this.sheet = workbook.getSheet(repport.getAutoID());
-            if (this.sheet == null) {
-                this.sheet = workbook.createSheet(repport.getAutoID());
-            }
-        } catch (Exception e) {}
-
-        int rownum = 0;{
-            Row row = sheet.createRow(rownum++);
-            int cellnum = 0;
-            Cell cellTime = row.createCell(cellnum++);
-            cellTime.setCellValue(repport.getTimeStamp());
-
-            Cell cellAuto = row.createCell(cellnum++);
-            cellAuto.setCellValue(repport.getAutoID());
-
-            Cell cellRoute = row.createCell(cellnum++);
-            cellRoute.setCellValue(repport.getRouteIDSUMO());
-
-            Cell cellSpeed = row.createCell(cellnum++);
-            cellSpeed.setCellValue(repport.getSpeed());
-
-            Cell cellDistance = row.createCell(cellnum++);
-            cellDistance.setCellValue(repport.getOdometer());
-
-            Cell cellMedia = row.createCell(cellnum++);
-            cellMedia.setCellValue(repport.getFuelConsumption());
-
-            Cell cellType = row.createCell(cellnum++);
-            cellType.setCellValue(repport.getFuelType());   
-
-            Cell cellCo2 = row.createCell(cellnum++);
-            cellCo2.setCellValue(repport.getCo2Emission());
-
-            Cell cellLongitude = row.createCell(cellnum++);
-            cellLongitude.setCellValue(repport.getLongitude());
-
-            Cell cellLatitude = row.createCell(cellnum++);
-            cellLatitude.setCellValue(repport.getLatitude());
-        }
-
-        try (FileOutputStream out = new FileOutputStream(Excel.fileName)) {
+    private Excel() {
+        singleExcel = true;
+        Sheet sheet = workbook.createSheet("00");
+        Row row = sheet.createRow(0);
+        int cellnum = 0;
+        row.createCell(cellnum++).setCellValue("TimeStamp");
+        row.createCell(cellnum++).setCellValue("AutoID");
+        row.createCell(cellnum++).setCellValue("RouteIDSUMO");
+        row.createCell(cellnum++).setCellValue("RoadIDSUMO");
+        row.createCell(cellnum++).setCellValue("Speed");
+        row.createCell(cellnum++).setCellValue("Odometer");
+        row.createCell(cellnum++).setCellValue("TotalOdometer");
+        row.createCell(cellnum++).setCellValue("DistanciaCalculada");
+        row.createCell(cellnum++).setCellValue("TotalCalc");
+        row.createCell(cellnum++).setCellValue("FuelConsumption");
+        row.createCell(cellnum++).setCellValue("FuelType");
+        row.createCell(cellnum++).setCellValue("Co2Emission");
+        row.createCell(cellnum++).setCellValue("Longitude");
+        row.createCell(cellnum++).setCellValue("Latitude");
+        try (FileOutputStream out = new FileOutputStream(fileName)) {
             workbook.write(out);
-            System.out.println("Arquivo Excel criado com sucesso!");
+            System.out.println("Excel iniciado");
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
-            try {
-                workbook.close();
+        }
+    }
+
+    public static synchronized void writeDataToExcel(DrivingData report) {
+        try {
+            semaphore.acquire();
+            if(!singleExcel){
+                new Excel();
+            }
+            Sheet sheet = workbook.getSheet(report.getAutoID());
+            if (sheet == null) {
+                sheet = workbook.createSheet(report.getAutoID());
+            }
+
+            int rownum = sheet.getLastRowNum() + 1;
+            int lastRow = sheet.getLastRowNum();
+            double totalDistanceOdometer = 0, totalDistanceCalc = 0;
+
+            Row row = sheet.createRow(rownum);
+
+            if (lastRow > 0) {
+                totalDistanceOdometer = report.getOdometer() + sheet.getRow(lastRow).getCell(5).getNumericCellValue();
+                totalDistanceCalc = report.getDistanciaCalculada() + sheet.getRow(lastRow).getCell(6).getNumericCellValue();
+            }
+            int cellnum = 0;
+            row.createCell(cellnum++).setCellValue(report.getTimeStamp());
+            row.createCell(cellnum++).setCellValue(report.getAutoID());
+            row.createCell(cellnum++).setCellValue(report.getRouteIDSUMO());
+            row.createCell(cellnum++).setCellValue(report.getRoadIDSUMO());
+            row.createCell(cellnum++).setCellValue(report.getSpeed());
+            row.createCell(cellnum++).setCellValue(report.getOdometer());
+            row.createCell(cellnum++).setCellValue(totalDistanceOdometer);
+            row.createCell(cellnum++).setCellValue(report.getDistanciaCalculada());
+            row.createCell(cellnum++).setCellValue(totalDistanceCalc);
+            row.createCell(cellnum++).setCellValue(report.getFuelConsumption());
+            row.createCell(cellnum++).setCellValue(report.getFuelType());
+            row.createCell(cellnum++).setCellValue(report.getCo2Emission());
+            row.createCell(cellnum++).setCellValue(report.getLongitude());
+            row.createCell(cellnum++).setCellValue(report.getLatitude());
+
+            try (FileOutputStream out = new FileOutputStream(fileName)) {
+                workbook.write(out);
+                System.out.println("Dados gravados com sucesso no arquivo Excel!");
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            Thread.currentThread().interrupt();
+        } finally {
+            semaphore.release();
         }
     }
 
-    public static void main(){
-        DrivingData repport = new DrivingData("TEST", "TEST", (long)1.0, 1.0, 1.0, "1", "1", 1.0, 1.0, 1.0, 1.0, 1, 1.0,1.0,1.0,1,1);
-        Excel excel = new Excel(repport);
+    public static synchronized void closeExcelFile() {
+        try {
+            workbook.close();
+            System.out.println("Arquivo Excel fechado com sucesso!");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
