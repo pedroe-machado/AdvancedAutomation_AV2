@@ -31,6 +31,7 @@ public abstract class Server extends Thread {
     }
 
     public void run() {
+        long expireTime = System.currentTimeMillis()+5000;
         String message = "";
         while (!message.equals("STOP") && message != null) {
             try {
@@ -41,6 +42,9 @@ public abstract class Server extends Thread {
                         message = new String(buffer, 0, read);
                         ProcessMessage(message);
                     }
+                }
+                if (System.currentTimeMillis() > expireTime) {
+                    break;
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -57,7 +61,7 @@ public abstract class Server extends Thread {
             } else {
                 messageBytes = message.getBytes();
             }
-            System.out.println("ServerSentmessage: " + message);
+            System.out.println("{SERVER:64/"+(Thread.currentThread().getName())+"} ServerSentmessage: " + message + " at " + System.currentTimeMillis());
             if(messageBytes!=null){
                 writer.write(messageBytes);
                 writer.flush();

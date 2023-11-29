@@ -34,7 +34,7 @@ public class Simulation extends Thread{
 	public void run() {
 		try {
 			while(this.sumo.isClosed()){
-				System.out.println("SUMO não iniciado");
+				System.out.println("{SIM:37} SUMO não iniciado - "+ System.currentTimeMillis());
 				Thread.sleep(100);
 			};
 
@@ -67,7 +67,7 @@ public class Simulation extends Thread{
 			try {
 				sumo.do_timestep();
 			} catch (Exception e) {
-				System.out.println("erro timestep");
+				System.out.println("{SIM:PERIODIC:70} Erro timestep - "+ System.currentTimeMillis());
 				e.printStackTrace();
 			}
 		}

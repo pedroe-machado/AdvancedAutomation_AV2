@@ -32,7 +32,7 @@ public class AlphaBank extends Service{
         for (String id : users) {
             accounts.put(id, new Account(id, 0));
         }
-        System.out.println("AlphaBank inaugurado");
+        System.out.println("{BANK:35} AlphaBank inaugurado -"+ System.currentTimeMillis());
     }
     @Override
     public Server CreateServerThread(Socket conn){
@@ -57,7 +57,7 @@ public class AlphaBank extends Service{
 
         public Transferencia(Socket conn) {
             super(conn);
-            System.out.println("Transferencia iniciada");
+            System.out.println("{BANK:60} Transferencia iniciada -"+ System.currentTimeMillis());
         }
 
         @Override
@@ -85,12 +85,12 @@ public class AlphaBank extends Service{
                     }
                 }
             } catch (Exception e) {
-                System.out.println("erroProcessMessage - AlphaBank");
+                System.out.println("{BANK:88} ErroProcessMessage -"+ System.currentTimeMillis());
                 this.valor = 0;
             } finally {
                 getAccount(idConta, senha).debita(valor);
                 transferePara(idBeneficiario, valor);
-                System.out.println("Transferencia de " + idConta + " para " + idBeneficiario + " no valor de " + valor + "- saldo: " + getAccount(idBeneficiario, idBeneficiario).getSaldo());
+                System.out.println("{BANK:93} Transferencia de " + idConta + " para " + idBeneficiario + " no valor de " + valor + "- saldo: " + getAccount(idBeneficiario, idBeneficiario).getSaldo() + " -"+ System.currentTimeMillis());
             }
         }
     }
@@ -114,7 +114,7 @@ public class AlphaBank extends Service{
         }
         public synchronized void debita(double valor){
             if(autenticado) saldo -= valor;
-            else System.out.println("erro de autenticacao");
+            else System.out.println("{BANK:117} Erro de autenticacao -"+ System.currentTimeMillis());
         }
         public synchronized boolean autenticar(String _senha){
             if( _senha.equalsIgnoreCase(senha)){

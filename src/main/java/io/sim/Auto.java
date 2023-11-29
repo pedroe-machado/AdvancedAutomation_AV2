@@ -62,11 +62,13 @@ public class Auto extends Thread {
 
 	@Override
 	public void run() {
-		try {
-			System.out.println("auto iniciou em " + System.currentTimeMillis());
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			System.out.println("erro largada auto");
+		if (this.on_off) {
+			try {
+				System.out.println("{AUTO:67} Auto iniciou em " + System.currentTimeMillis());
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				System.out.println("erro largada auto");
+			}
 		}
 		while (this.on_off) {
 			try {
@@ -76,18 +78,25 @@ public class Auto extends Thread {
 				e.printStackTrace();
 			}
 		}
-		if (on_off == false) {
-			System.out.println("auto desligou em " + System.currentTimeMillis());	
+		if (this.on_off == false) {
+			try {
+				System.out.println("{AUTO:83/run} auto desligou em " + System.currentTimeMillis());
+				Thread.sleep(2000);
+				Excel.closeExcelFile();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
 	private synchronized void atualizaSensores() throws InterruptedException {
-		int attempt = 3;
+		int attempt = 10;
 		synchronized (monitor) {
 			while (attempt > 0) {
+				//System.out.println("{AUTO:96} Attempt: " + attempt);
 				try {
 					if (!this.getSumo().isClosed()) {
-						if (isOn()) {
+							if (onSumo()) {
 							//System.out.println("Vehicle exists");
 							SumoPosition2D sumoPosition2D = (SumoPosition2D) sumo.do_job_get(Vehicle.getPosition(this.idAuto));
 							infoDistanceCompany = km.calcular(sumoPosition2D.toString()); // EXIGÊNCIA CALCULO LONG/LAT
@@ -112,30 +121,33 @@ public class Auto extends Thread {
 							Excel.writeDataToExcel(_repport);
 							// graph.addData(_repport.getCo2Emission(), "CO2 Emission", "Time");
 
-							sumo.do_job_set(Vehicle.setSpeedMode(this.idAuto, 0));
-							sumo.do_job_set(Vehicle.setSpeed(this.idAuto, 6.95));
+							//sumo.do_job_set(Vehicle.setSpeedMode(this.idAuto, 0));
+							//sumo.do_job_set(Vehicle.setSpeed(this.idAuto, 6.95));
 
 							sensoresAtualizados = true;
 							monitor.notify();
+							System.out.println("{AUTO:130} Vehicle updated at time: " + System.currentTimeMillis());
 							break;
+
 						} else {
-							//System.out.println("Vehicle still do not exist at time: " + System.currentTimeMillis());
-							Thread.sleep(7000);
+							attempt--;
+							System.out.println("{AUTO:134} Vehicle still do not exist at time: " + System.currentTimeMillis());
+							Thread.sleep(4000);
 						}
 					} else {
-						System.out.println("Sumo is closed");
+						System.out.println("{AUTO:138/attSensores} Sumo is closed");
+						Thread.sleep(1000);
 					}
 				} catch (Exception e) {
 					Thread.sleep(20);
 					System.out.println("sensor não atualizou");
-					attempt--;
 					e.printStackTrace();
 				}
 			}
 		}
 	}
 
-	private boolean isOn() {
+	public boolean onSumo() {
 		SumoStringList vehiclesON = null;
 		try {
 			vehiclesON = (SumoStringList) this.sumo.do_job_get(Vehicle.getIDList());
@@ -161,6 +173,7 @@ public class Auto extends Thread {
 			while (!sensoresAtualizados) {
 				monitor.wait();
 			}
+			//Thread.sleep(100);
 			sensoresAtualizados = false;
 		}
 	}

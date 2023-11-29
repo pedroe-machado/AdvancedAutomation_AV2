@@ -13,6 +13,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -23,7 +24,7 @@ import org.xml.sax.SAXException;
 import de.tudresden.sumo.objects.SumoColor;
 import de.tudresden.sumo.objects.SumoStringList;
 import it.polito.appeal.traci.SumoTraciConnection;
-
+@SuppressWarnings("unused")
 public class Company extends Thread{
     public static String uriRoutesXML = "map\\map.rou.xml";
 
@@ -47,7 +48,7 @@ public class Company extends Thread{
         this.drivers = new ArrayList<Driver>();
 
         this.start();
-        System.out.println("Company iniciado");
+        System.out.println("{COMPANY:51} Company iniciado - " + System.currentTimeMillis());
     }
     
     @Override
@@ -64,13 +65,13 @@ public class Company extends Thread{
         for (int i = 0; i < 1; i++) { // Contratação de Drivers e cadastro de novos carros
             try {
                 Car newCar = new Car(true, Integer.toString(i)+"0", new SumoColor(0, 255, 0, 126), Integer.toString(i), sumo,
-                        1000, 2, 2, 5.87, 5, 1);
+                        500, 2, 2, 5.87, 5, 1);
                 carrosFirma.add(i, newCar);
-                System.out.println("Carro " + Integer.toString(i)+"0" + " contratado.");
+                System.out.println("{COMPANY:70} Carro " + Integer.toString(i)+"0" + " contratado.");
 
                 Driver newDriver = new Driver(sumo, Integer.toString(i)+"0", newCar);
                 drivers.add(i, newDriver);
-                System.out.println("Driver " + Integer.toString(i)+"0" + " contratado.");
+                System.out.println("{COMPANY:74} Driver " + Integer.toString(i)+"0" + " contratado.");
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -80,10 +81,10 @@ public class Company extends Thread{
 
         for (int i = 0; i <= carrosFirma.size()-1; i++) {
             carrosFirma.get(i).start();
-            System.out.println("Carro " + Integer.toString(i)+"0" + " iniciado.");
+            System.out.println("{COMPANY:84} Carro " + Integer.toString(i)+"0" + " iniciado. "+ System.currentTimeMillis());
 
             drivers.get(i).start();
-            System.out.println("Driver " + Integer.toString(i)+"0" + " iniciado.");
+            System.out.println("{COMPANY:87} Driver " + Integer.toString(i)+"0" + " iniciado. "+ System.currentTimeMillis());
             
             try {
                 Thread.sleep(100);
@@ -105,7 +106,7 @@ public class Company extends Thread{
         public void run(){
             this.routes = parseRoutes();
             //limpaXml();
-            System.out.println("Rotas criadas com sucesso.");
+            System.out.println("{COMPANY:109} Rotas criadas com sucesso. "+ System.currentTimeMillis());
         }
         private Queue<Route> parseRoutes() {         
             Queue<Route> routesQueue = new LinkedList<>();
@@ -241,6 +242,7 @@ public class Company extends Thread{
      * @return Route a ser atribuida a um novo Service 
      */
     private class ManageRoute extends Server{
+        private static int repeat = 100;
         private JSONObject jsonRoute;
         private boolean resumedRoute;
         private Route routeFinalizada;
@@ -250,27 +252,40 @@ public class Company extends Thread{
             resumedRoute = true;
             jsonRoute = new JSONObject();
             try {
-                routeFinalizada = Route.fromJson(jsonObject.get("route").toString());
+                JSONArray jsonArray = jsonObject.getJSONArray("edges");
+                SumoStringList sumoStringList = new SumoStringList();
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    sumoStringList.add(jsonArray.getString(i));
+                }
+                routeFinalizada = new Route(jsonObject.getString("finishedRoute"),sumoStringList);                
+                
             } catch (Exception e) {
-                System.out.println("primeira rota");
+                System.out.println("{COMPANY:264} Primeira rota");
                 resumedRoute = false;
             }
             this.start();
         }
         private synchronized void reorganize(){
+            Route auxRoute;
             try{
-                Route auxRoute = getRoutesAccess().poll();
-                System.out.println(Integer.parseInt(auxRoute.getId()) + " ! " + getRunningAccess().size());
+                if(!resumedRoute){
+                    auxRoute = getRoutesAccess().poll();
+                } else { 
+                    auxRoute = routeFinalizada;
+                }
+                //System.out.println(Integer.parseInt(auxRoute.getId()) + " ! ");
                 getRunningAccess().add(Integer.parseInt(auxRoute.getId()), auxRoute);
                 this.jsonRoute.put("idRota",auxRoute.getId());
                 this.jsonRoute.put("edges", auxRoute.getEdges());
                 if(resumedRoute){
-                    getFinishedAccess().add(Integer.parseInt(routeFinalizada.getId()),routeFinalizada);
+                    //getFinishedAccess().add(Integer.parseInt(routeFinalizada.getId()),routeFinalizada);
+                    repeat--;
                 }
             } catch (NullPointerException e){
                 System.out.println("erro ao acessar lista");
             }
         }
+
         @Override
         public void run() {
             try {
@@ -278,8 +293,13 @@ public class Company extends Thread{
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            reorganize();
-            SendMessage(jsonRoute);
+            if (repeat > 0) {
+                reorganize();
+                SendMessage(jsonRoute);
+            } else {
+                System.out.println("executou 100 vezes");
+                sumo.close();
+            }
         }
         @Override
         protected void ProcessMessage(String message) {
@@ -308,7 +328,7 @@ public class Company extends Thread{
                 attMap(idAuto, newDistancia);
                 this.start();
             } catch (NullPointerException e) {
-                System.out.println("error mapa de distancias");
+                System.out.println("{COMPANY:331} Error mapa de distancias -"+ System.currentTimeMillis());
             } catch (ClassCastException e){
                 e.printStackTrace();
             }
@@ -323,11 +343,11 @@ public class Company extends Thread{
             distance = controlMap.get(idAuto);
             distance += newDistance;
             controlMap.put(idAuto,distance);
-            System.out.println("atualizacao mapa:"+ idAuto + " " + distance);
+            //System.out.println("atualizacao mapa:"+ idAuto + " " + distance);
         }
         @Override
         public void run(){
-            if(distance>=10){
+            if(distance>=1000){
                 try {
                     new BotPayment(idAuto);
                     controlMap.put(idAuto,0.0);

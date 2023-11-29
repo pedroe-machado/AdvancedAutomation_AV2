@@ -16,7 +16,7 @@ public class FuelStation extends Thread {
         client = new Client("127.0.0.1", 20180);
         semaphore = new Semaphore(pumps);
         flowControl = new HashMap<>();
-        System.out.println("FuelStation inaugurada");
+        System.out.println("{FUEL:19} FuelStation inaugurada - "+ System.currentTimeMillis());
     }
     public static FuelStation getInstance(int pumps){
         if(singleStation == null){

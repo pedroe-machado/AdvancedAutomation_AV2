@@ -9,11 +9,13 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class Excel {
     private static boolean singleExcel=false;
+    private static double totalDistanceOdometer = 0, totalDistanceCalc = 0;
     private static final Semaphore semaphore = new Semaphore(1);
     private static final String fileName = "C:\\Users\\Usuario\\OneDrive\\Documentos\\UFLA\\11 periodo\\AutomacaoAvancada\\AdvancedAutomation_AV2\\data\\Relatorio.xlsx";
-    private static XSSFWorkbook workbook = new XSSFWorkbook();
+    private static XSSFWorkbook workbook;
 
     private Excel() {
+        workbook = new XSSFWorkbook();
         singleExcel = true;
         Sheet sheet = workbook.createSheet("00");
         Row row = sheet.createRow(0);
@@ -24,9 +26,7 @@ public class Excel {
         row.createCell(cellnum++).setCellValue("RoadIDSUMO");
         row.createCell(cellnum++).setCellValue("Speed");
         row.createCell(cellnum++).setCellValue("Odometer");
-        row.createCell(cellnum++).setCellValue("TotalOdometer");
         row.createCell(cellnum++).setCellValue("DistanciaCalculada");
-        row.createCell(cellnum++).setCellValue("TotalCalc");
         row.createCell(cellnum++).setCellValue("FuelConsumption");
         row.createCell(cellnum++).setCellValue("FuelType");
         row.createCell(cellnum++).setCellValue("Co2Emission");
@@ -34,7 +34,7 @@ public class Excel {
         row.createCell(cellnum++).setCellValue("Latitude");
         try (FileOutputStream out = new FileOutputStream(fileName)) {
             workbook.write(out);
-            System.out.println("Excel iniciado");
+            System.out.println("{EXCEL:37} Excel iniciado");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -46,6 +46,8 @@ public class Excel {
             if(!singleExcel){
                 new Excel();
             }
+            workbook = new XSSFWorkbook();
+            
             Sheet sheet = workbook.getSheet(report.getAutoID());
             if (sheet == null) {
                 sheet = workbook.createSheet(report.getAutoID());
@@ -53,7 +55,7 @@ public class Excel {
 
             int rownum = sheet.getLastRowNum() + 1;
             int lastRow = sheet.getLastRowNum();
-            double totalDistanceOdometer = 0, totalDistanceCalc = 0;
+
 
             Row row = sheet.createRow(rownum);
 
@@ -68,9 +70,7 @@ public class Excel {
             row.createCell(cellnum++).setCellValue(report.getRoadIDSUMO());
             row.createCell(cellnum++).setCellValue(report.getSpeed());
             row.createCell(cellnum++).setCellValue(report.getOdometer());
-            row.createCell(cellnum++).setCellValue(totalDistanceOdometer);
             row.createCell(cellnum++).setCellValue(report.getDistanciaCalculada());
-            row.createCell(cellnum++).setCellValue(totalDistanceCalc);
             row.createCell(cellnum++).setCellValue(report.getFuelConsumption());
             row.createCell(cellnum++).setCellValue(report.getFuelType());
             row.createCell(cellnum++).setCellValue(report.getCo2Emission());
@@ -79,7 +79,7 @@ public class Excel {
 
             try (FileOutputStream out = new FileOutputStream(fileName)) {
                 workbook.write(out);
-                System.out.println("Dados gravados com sucesso no arquivo Excel!");
+                //System.out.println("Dados gravados com sucesso no arquivo Excel!");
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -93,10 +93,39 @@ public class Excel {
 
     public static synchronized void closeExcelFile() {
         try {
+           Sheet sheet = workbook.getSheet("00");
+           Row row = sheet.createRow(sheet.getLastRowNum()+1);
+           row.createCell(0).setCellValue(""); 
+           try (FileOutputStream out = new FileOutputStream(fileName)) {
+                workbook.write(out);
+                System.out.println("Separando dados...");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             workbook.close();
             System.out.println("Arquivo Excel fechado com sucesso!");
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public static synchronized void doLine(){
+        try {
+            semaphore.acquire();
+            Sheet sheet = workbook.getSheet("00");
+            Row row = sheet.createRow(sheet.getLastRowNum()+1);
+            row.createCell(0).setCellValue(""); 
+            try (FileOutputStream out = new FileOutputStream(fileName)) {
+                 workbook.write(out);
+                 System.out.println("Separando dados...");
+             } catch (IOException e) {
+                 e.printStackTrace();
+             }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            Thread.currentThread().interrupt();
+        } finally {
+            semaphore.release();
         }
     }
 }

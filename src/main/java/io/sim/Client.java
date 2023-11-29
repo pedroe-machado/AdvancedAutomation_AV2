@@ -41,7 +41,7 @@ public class Client {
             } else {
                 messageBytes = message.getBytes();
             }
-            System.out.println("ClientSentMessage: " + message);
+            System.out.println("{CLIENT:44} ClientSentMessage: " + message);
             if(messageBytes!=null){
                 writer.write(messageBytes);
                 writer.flush();
@@ -52,7 +52,7 @@ public class Client {
     }
     public JSONObject Listen() throws Exception {
         JSONObject jsonObject = null;
-        System.out.println("listening");
+        System.out.println("{CLIENT:55} Listening");
         byte[] buffer = new byte[1024];
         int bytesRead = reader.read(buffer);
         if (bytesRead > 0) {
@@ -64,7 +64,7 @@ public class Client {
             } else {
                 jsonObject = new JSONObject(message);
             }
-            System.out.println("receivedmessage: " + message + " " + jsonObject.toString());
+            System.out.println("{CLIENT:67} Receivedmessage: " + message);
         }
         return jsonObject;
     }
