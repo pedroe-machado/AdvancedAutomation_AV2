@@ -90,61 +90,55 @@ public class Auto extends Thread {
 	}
 
 	private synchronized void atualizaSensores() throws InterruptedException {
-		int attempt = 10;
 		synchronized (monitor) {
-			while (attempt > 0) {
-				//System.out.println("{AUTO:96} Attempt: " + attempt);
-				try {
-					if (!this.getSumo().isClosed()) {
-							if (onSumo()) {
-							//System.out.println("Vehicle exists");
-							SumoPosition2D sumoPosition2D = (SumoPosition2D) sumo.do_job_get(Vehicle.getPosition(this.idAuto));
-							infoDistanceCompany = km.calcular(sumoPosition2D.toString()); // EXIGÊNCIA CALCULO LONG/LAT
+			try {
+				if (!this.getSumo().isClosed()) {
+					if (onSumo()) {
+						SumoPosition2D sumoPosition2D = (SumoPosition2D) sumo
+								.do_job_get(Vehicle.getPosition(this.idAuto));
+						infoDistanceCompany = km.calcular(sumoPosition2D.toString()); // EXIGÊNCIA CALCULO LONG/LAT
 
-							_repport = new DrivingData(this.idAuto, this.driverID,
-									System.nanoTime(), // Timestamp
-									sumoPosition2D.x, // posX
-									sumoPosition2D.y, // posY
-									(String) this.sumo.do_job_get(Vehicle.getRoadID(this.idAuto)), // actual edge
-									(String) this.sumo.do_job_get(Vehicle.getRouteID(this.idAuto)), // actual route
-									(double) sumo.do_job_get(Vehicle.getSpeed(this.idAuto)), // speed
-									infoDistanceCompany, // traveled distance calculated from last step
-									(double) sumo.do_job_get(Vehicle.getFuelConsumption(this.idAuto)), 
-									1, this.fuelType, this.fuelPrice,
-									(double) sumo.do_job_get(Vehicle.getCO2Emission(this.idAuto)), 
-									(double) sumo.do_job_get(Vehicle.getHCEmission(this.idAuto)), 
-									this.personCapacity, // the total number of persons that can ride in this vehicle
-									this.personNumber, // the total number of persons which are riding in this vehicle
-									infoDistanceCompany
-							);
-							this.drivingRepport.add(_repport);
-							Excel.writeDataToExcel(_repport);
-							// graph.addData(_repport.getCo2Emission(), "CO2 Emission", "Time");
+						_repport = new DrivingData(this.idAuto, this.driverID,
+								System.nanoTime(), // Timestamp
+								sumoPosition2D.x, // posX
+								sumoPosition2D.y, // posY
+								(String) this.sumo.do_job_get(Vehicle.getRoadID(this.idAuto)), // actual edge
+								(String) this.sumo.do_job_get(Vehicle.getRouteID(this.idAuto)), // actual route
+								(double) sumo.do_job_get(Vehicle.getSpeed(this.idAuto)), // speed
+								infoDistanceCompany, // traveled distance calculated from last step
+								(double) sumo.do_job_get(Vehicle.getFuelConsumption(this.idAuto)),
+								1, this.fuelType, this.fuelPrice,
+								(double) sumo.do_job_get(Vehicle.getCO2Emission(this.idAuto)),
+								(double) sumo.do_job_get(Vehicle.getHCEmission(this.idAuto)),
+								this.personCapacity, // the total number of persons that can ride in this vehicle
+								this.personNumber, // the total number of persons which are riding in this vehicle
+								infoDistanceCompany);
+						this.drivingRepport.add(_repport);
+						Excel.writeDataToExcel(_repport);
+						// graph.addData(_repport.getCo2Emission(), "CO2 Emission", "Time");
 
-							//sumo.do_job_set(Vehicle.setSpeedMode(this.idAuto, 0));
-							//sumo.do_job_set(Vehicle.setSpeed(this.idAuto, 6.95));
+						// sumo.do_job_set(Vehicle.setSpeedMode(this.idAuto, 0));
+						// sumo.do_job_set(Vehicle.setSpeed(this.idAuto, 6.95));
 
-							sensoresAtualizados = true;
-							monitor.notify();
-							System.out.println("{AUTO:130} Vehicle updated at time: " + System.currentTimeMillis());
-							break;
-
-						} else {
-							attempt--;
-							System.out.println("{AUTO:134} Vehicle still do not exist at time: " + System.currentTimeMillis());
-							Thread.sleep(4000);
-						}
+						sensoresAtualizados = true;
+						monitor.notify();
+						System.out.println("{AUTO:130} Vehicle updated at time: " + System.currentTimeMillis());
+					
 					} else {
-						System.out.println("{AUTO:138/attSensores} Sumo is closed");
-						Thread.sleep(1000);
+						System.out.println("{AUTO:129} Vehicle still do not exist at time: " + System.currentTimeMillis());
+						Thread.sleep(4000);
 					}
-				} catch (Exception e) {
-					Thread.sleep(20);
-					System.out.println("sensor não atualizou");
-					e.printStackTrace();
+				} else {
+					System.out.println("{AUTO:133/attSensores} Sumo is closed");
+					Thread.sleep(1000);
 				}
+			} catch (Exception e) {
+				Thread.sleep(20);
+				System.out.println("sensor não atualizou");
+				e.printStackTrace();
 			}
 		}
+
 	}
 
 	public boolean onSumo() {

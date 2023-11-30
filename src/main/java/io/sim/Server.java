@@ -31,7 +31,7 @@ public abstract class Server extends Thread {
     }
 
     public void run() {
-        long expireTime = System.currentTimeMillis()+5000;
+        long expireTime = System.currentTimeMillis()+4000;
         String message = "";
         while (!message.equals("STOP") && message != null) {
             try {

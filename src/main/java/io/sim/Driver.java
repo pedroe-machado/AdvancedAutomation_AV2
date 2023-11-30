@@ -36,17 +36,19 @@ public class Driver extends Thread {
         Thread.currentThread().setName("Driver "+idDriver);
         System.out.println("{DRIVER:37} Driver iniciou em "+ System.currentTimeMillis());
         while (carro.isAlive()) {
-            //System.out.println("carro vivo");
+            //System.out.println("{DRIVER:39} "+ idDriver + " Driver vivo " + System.currentTimeMillis());
             if(carro.theresNewRoute()){
+                System.out.println("{DRIVER:40} "+ idDriver + " Recebeu rota em " + System.currentTimeMillis());
                 try {
                     done.add(Integer.parseInt(currentRoute.getId()), currentRoute); //adiciona rota finalizada
                     currentService.setOn(false);
                     currentService.join();
-                } catch (Exception e) {
+                } catch (NullPointerException e) {
                     System.out.println("{DRIVER:46} Nenhuma rota finalizada");
+                } catch (InterruptedException e){
+                    e.printStackTrace();
                 }
                 currentRoute = carro.getCurrenRoute();
-                
                 currentService = new TransportService(true, idConta, carro, sumo);
                 currentService.start();
                 carro.ackNewRoute();

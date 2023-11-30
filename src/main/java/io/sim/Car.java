@@ -28,7 +28,7 @@ public class Car extends Thread{
 	
 	public Car( boolean _on_off, String _idAuto, SumoColor _colorAuto, String _driverID, SumoTraciConnection sumo, long _acquisitionRate, int _fuelType, int _fuelPreferential, double _fuelPrice, int _personCapacity, int _personNumber) throws Exception {    
         this.auto = new Auto(_on_off, _idAuto, _colorAuto, _driverID, sumo, _acquisitionRate, _fuelType,_fuelPreferential, _fuelPrice, _personCapacity, _personNumber);
-        this.fuelTank = 10;
+        this.fuelTank = 100;
         this.sumo = sumo;
         this.idAuto = _idAuto;
         this.acquisitionRate = _acquisitionRate;
@@ -53,7 +53,7 @@ public class Car extends Thread{
         while(true){
             try {
                 auto.esperaSensores();
-                notificaRefresh();
+                //notificaRefresh();
                 double fuelConsumption = (Double) sumo.do_job_get(Vehicle.getFuelConsumption(idAuto));
                 this.fuelTank -= (((float)fuelConsumption)*((float)acquisitionRate/1000))/(750000); // conversão mg/s -> L
                 //System.out.println( idAuto + " tanque: " + fuelTank);
@@ -65,13 +65,14 @@ public class Car extends Thread{
                     sumo.do_job_set(Vehicle.setSpeed(idAuto, 0.0));
                 }
                 if (onFinalSpace()) {
-                    while(onSumo());
+                    sumo.do_job_set(Vehicle.setSpeed(idAuto, 0.0));
                     new AskRoute(currentRoute);
                     synchronized (resetLock) {
                         if (!theresNewRoute) {
                             System.out.println("{CAR:72} Esperando nova rota - "+ System.currentTimeMillis());
                             try {
                                 resetLock.wait();
+                                System.out.println("{CAR:75} Nova rota recebida - "+ System.currentTimeMillis());
                             } catch (Exception e) {
                                 e.printStackTrace();
                                 Thread.currentThread().interrupt();

@@ -2,12 +2,14 @@ package io.sim;
 
 import de.tudresden.sumo.cmd.Route;
 import de.tudresden.sumo.cmd.Vehicle;
+import de.tudresden.sumo.objects.SumoPosition2D;
 import de.tudresden.sumo.objects.SumoStringList;
 import it.polito.appeal.traci.SumoTraciConnection;
 
 public class TransportService extends Thread {
 
 	private String idTransportService;
+	private SumoPosition2D posInicial;
 	private boolean on_off;
 	private SumoTraciConnection sumo;
 	private Car car;
@@ -27,8 +29,8 @@ public class TransportService extends Thread {
 		try {
 			this.initializeRoute();
 			while (this.on_off) {
-				Thread.sleep(this.car.getAcquisitionRate());
-				//System.out.println("{TS:31} TransportService " + this.idTransportService + " running at time: " + System.currentTimeMillis());
+				Thread.sleep(2000);
+				System.out.println("{TS:31} TransportService " + this.idTransportService + " running at time: " + System.currentTimeMillis());
 				if (this.getSumo().isClosed()) {
 					this.on_off = false;
 					System.out.println("{TS:34} SUMO is closed...");
@@ -83,8 +85,8 @@ public class TransportService extends Thread {
 
 				if(car.onFinalSpace()){
 					System.out.println("{TS:84/initRoute} Carro está na vaga final - teleportando para a vaga inicial");
-					sumo.do_job_set(Vehicle.moveTo(car.getIdAuto(), (String)sumo.do_job_get(Vehicle.getLaneID(car.getIdAuto())), (Double)sumo.do_job_get(Route.getParameter(car.getCurrenRoute().getId(), "begin"))));
-				}
+					
+				} 
 
 				sumo.do_job_set(Vehicle.setRouteID(car.getIdAuto(), car.getCurrenRoute().getId()));
 				System.out.println("{TS:89/initRoute} Vehicle " + car.getIdAuto() + " setRouteID at time: " + System.currentTimeMillis());
