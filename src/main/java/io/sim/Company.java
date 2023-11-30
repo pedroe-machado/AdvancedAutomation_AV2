@@ -280,7 +280,7 @@ public class Company extends Thread{
                 if(resumedRoute){
                     //getFinishedAccess().add(Integer.parseInt(routeFinalizada.getId()),routeFinalizada);
                     repeat--;
-                    Excel.doLine();
+                    Excel.newSheet(100-repeat);
                 }
             } catch (NullPointerException e){
                 System.out.println("erro ao acessar lista");

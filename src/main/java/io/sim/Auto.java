@@ -114,7 +114,8 @@ public class Auto extends Thread {
 								this.personNumber, // the total number of persons which are riding in this vehicle
 								infoDistanceCompany);
 						this.drivingRepport.add(_repport);
-						Excel.writeDataToExcel(_repport);
+						
+						if(infoDistanceCompany<40) Excel.writeDataToExcel(_repport);
 						// graph.addData(_repport.getCo2Emission(), "CO2 Emission", "Time");
 
 						// sumo.do_job_set(Vehicle.setSpeedMode(this.idAuto, 0));
