@@ -9,7 +9,7 @@ import it.polito.appeal.traci.SumoTraciConnection;
 public class TransportService extends Thread {
 
 	private String idTransportService;
-	private SumoPosition2D posInicial;
+	private boolean singleCall;
 	private boolean on_off;
 	private SumoTraciConnection sumo;
 	private Car car;
@@ -21,6 +21,7 @@ public class TransportService extends Thread {
 		this.idTransportService = _idTransportService;
 		this.car = car;
 		this.sumo = _sumo;
+		this.singleCall = true;
 	}
 
 	@Override
@@ -29,8 +30,14 @@ public class TransportService extends Thread {
 		try {
 			this.initializeRoute();
 			while (this.on_off) {
-				Thread.sleep(2000);
-				System.out.println("{TS:31} TransportService " + this.idTransportService + " running at time: " + System.currentTimeMillis());
+				Thread.sleep(car.getAcquisitionRate());
+				System.out.println("{TS:31} TransportService " + this.idTransportService + " running at time: "+ System.currentTimeMillis());
+				if (!singleCall) {
+					if (car.onFinalSpace()) {
+						System.out.println("{TS:37/initRoute} Carro está na edge final");
+						singleCall = car.askNewRoute();
+					}
+				}
 				if (this.getSumo().isClosed()) {
 					this.on_off = false;
 					System.out.println("{TS:34} SUMO is closed...");
@@ -83,11 +90,6 @@ public class TransportService extends Thread {
 					Thread.sleep(1000);
 				};
 
-				if(car.onFinalSpace()){
-					System.out.println("{TS:84/initRoute} Carro está na vaga final - teleportando para a vaga inicial");
-					
-				} 
-
 				sumo.do_job_set(Vehicle.setRouteID(car.getIdAuto(), car.getCurrenRoute().getId()));
 				System.out.println("{TS:89/initRoute} Vehicle " + car.getIdAuto() + " setRouteID at time: " + System.currentTimeMillis());
 
@@ -95,6 +97,7 @@ public class TransportService extends Thread {
 				System.out.println("{TS:92/initRoute} Vehicle " + car.getIdAuto() + " setSpeedMode 31 at time: " + System.currentTimeMillis());
 				System.out.println("{TS:93/initRoute} Vehicle " + car.getIdAuto() + " initialized at time: " + System.currentTimeMillis());
 				
+				singleCall = false;
 				break;
 
 			} catch (Exception e1) {

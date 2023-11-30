@@ -122,8 +122,7 @@ public class Auto extends Thread {
 
 						sensoresAtualizados = true;
 						monitor.notify();
-						System.out.println("{AUTO:130} Vehicle updated at time: " + System.currentTimeMillis());
-					
+						//System.out.println("{AUTO:130} Vehicle updated at time: " + System.currentTimeMillis());
 					} else {
 						System.out.println("{AUTO:129} Vehicle still do not exist at time: " + System.currentTimeMillis());
 						Thread.sleep(4000);

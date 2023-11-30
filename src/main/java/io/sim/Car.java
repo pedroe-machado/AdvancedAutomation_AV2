@@ -19,6 +19,7 @@ public class Car extends Thread{
     private boolean needFuel;
     private boolean abastecendo;
     private boolean theresNewRoute;
+    private boolean needNewRoute;
     private float fuelTank;
     private Route currentRoute;
     private SumoTraciConnection sumo;
@@ -57,15 +58,15 @@ public class Car extends Thread{
                 double fuelConsumption = (Double) sumo.do_job_get(Vehicle.getFuelConsumption(idAuto));
                 this.fuelTank -= (((float)fuelConsumption)*((float)acquisitionRate/1000))/(750000); // conversão mg/s -> L
                 //System.out.println( idAuto + " tanque: " + fuelTank);
-                if(auto.getLastDistance()<40.0) new SendInfo().setPriority(7); //o carro não deve passar de 40m/s
+                if(auto.getLastDistance()<40.0 && !needNewRoute) new SendInfo().setPriority(7); //o carro não deve passar de 40m/s
                 
                 if(fuelTank<=3 && !abastecendo){
                     System.out.println(idAuto+" precisa abastecer");
                     needFuel = true;
                     sumo.do_job_set(Vehicle.setSpeed(idAuto, 0.0));
                 }
-                if (onFinalSpace()) {
-                    sumo.do_job_set(Vehicle.setSpeed(idAuto, 0.0));
+                if (needNewRoute && !theresNewRoute) {
+                    sumo.do_job_set(Vehicle.remove(idAuto, (byte)0));
                     new AskRoute(currentRoute);
                     synchronized (resetLock) {
                         if (!theresNewRoute) {
@@ -97,6 +98,11 @@ public class Car extends Thread{
             refresh = true;
             monitorDriver.notify();
         }
+    }
+
+    public boolean askNewRoute() throws Exception{
+        needNewRoute = true;
+        return true;
     }
 
     public boolean onFinalSpace() throws Exception{
@@ -239,6 +245,7 @@ public class Car extends Thread{
 
     public void ackNewRoute(){
         this.theresNewRoute = false;
+        this.needNewRoute = false;
         synchronized(resetLock){
             resetLock.notify();
         }

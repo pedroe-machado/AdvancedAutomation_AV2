@@ -9,7 +9,6 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class Excel {
     private static boolean singleExcel=false;
-    private static double totalDistanceOdometer = 0, totalDistanceCalc = 0;
     private static final Semaphore semaphore = new Semaphore(1);
     private static final String fileName = "C:\\Users\\Usuario\\OneDrive\\Documentos\\UFLA\\11 periodo\\AutomacaoAvancada\\AdvancedAutomation_AV2\\data\\Relatorio.xlsx";
     private static XSSFWorkbook workbook;
@@ -46,7 +45,6 @@ public class Excel {
             if(!singleExcel){
                 new Excel();
             }
-            workbook = new XSSFWorkbook();
             
             Sheet sheet = workbook.getSheet(report.getAutoID());
             if (sheet == null) {
@@ -54,15 +52,10 @@ public class Excel {
             }
 
             int rownum = sheet.getLastRowNum() + 1;
-            int lastRow = sheet.getLastRowNum();
-
 
             Row row = sheet.createRow(rownum);
+            //System.out.println("{EXCEL:58} "+ report.getAutoID() + " escrevendo linha " + rownum + " em " + System.currentTimeMillis());
 
-            if (lastRow > 0) {
-                totalDistanceOdometer = report.getOdometer() + sheet.getRow(lastRow).getCell(5).getNumericCellValue();
-                totalDistanceCalc = report.getDistanciaCalculada() + sheet.getRow(lastRow).getCell(6).getNumericCellValue();
-            }
             int cellnum = 0;
             row.createCell(cellnum++).setCellValue(report.getTimeStamp());
             row.createCell(cellnum++).setCellValue(report.getAutoID());
