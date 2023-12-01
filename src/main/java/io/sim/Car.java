@@ -29,7 +29,7 @@ public class Car extends Thread{
 	
 	public Car( boolean _on_off, String _idAuto, SumoColor _colorAuto, String _driverID, SumoTraciConnection sumo, long _acquisitionRate, int _fuelType, int _fuelPreferential, double _fuelPrice, int _personCapacity, int _personNumber) throws Exception {    
         this.auto = new Auto(_on_off, _idAuto, _colorAuto, _driverID, sumo, _acquisitionRate, _fuelType,_fuelPreferential, _fuelPrice, _personCapacity, _personNumber);
-        this.fuelTank = 100;
+        this.fuelTank = 10;
         this.sumo = sumo;
         this.idAuto = _idAuto;
         this.acquisitionRate = _acquisitionRate;

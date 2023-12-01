@@ -2,7 +2,6 @@ package io.sim;
 
 import de.tudresden.sumo.cmd.Route;
 import de.tudresden.sumo.cmd.Vehicle;
-import de.tudresden.sumo.objects.SumoPosition2D;
 import de.tudresden.sumo.objects.SumoStringList;
 import it.polito.appeal.traci.SumoTraciConnection;
 
