@@ -248,4 +248,19 @@ public class DrivingData {
 		return this.distanciaCalculada;
 	}	
 
+	@Override
+	public String toString(){
+		return "DrivingData{" +
+				"Auto='" + autoID + '\'' +
+				", TimeStamp=" + timeStamp +
+				", x_Pos=" + x_Position +
+				", y_Pos=" + y_Position +
+				", Edge='" + roadIDSUMO + '\'' +
+				", Speed=" + speed +
+				", Distancia=" + distanciaCalculada +
+				", FuelConsumption=" + fuelConsumption +
+				", PersonNumber=" + personNumber +
+				", CO2=" + co2Emission +
+				'}';
+	}
 }
