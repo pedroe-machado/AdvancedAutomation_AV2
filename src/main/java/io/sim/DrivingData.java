@@ -253,14 +253,11 @@ public class DrivingData {
 		return "DrivingData{" +
 				"Auto='" + autoID + '\'' +
 				", TimeStamp=" + timeStamp +
-				", x_Pos=" + x_Position +
-				", y_Pos=" + y_Position +
+				", x_Pos=" + String.format("%.3f",x_Position) +
+				", y_Pos=" + String.format("%.3f",y_Position) +
 				", Edge='" + roadIDSUMO + '\'' +
-				", Speed=" + speed +
-				", Distancia=" + distanciaCalculada +
-				", FuelConsumption=" + fuelConsumption +
-				", PersonNumber=" + personNumber +
-				", CO2=" + co2Emission +
+				", Speed=" + String.format("%.3f",speed) +
+				", Distancia=" + String.format("%.3f",distanciaCalculada) +
 				'}';
 	}
 }

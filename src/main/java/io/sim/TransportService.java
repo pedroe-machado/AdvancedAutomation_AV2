@@ -30,7 +30,7 @@ public class TransportService extends Thread {
 			this.initializeRoute();
 			while (this.on_off) {
 				Thread.sleep(car.getAcquisitionRate());
-				System.out.println("{TS:31} TransportService " + this.idTransportService + " running at time: "+ System.currentTimeMillis());
+				//System.out.println("{TS:31} TransportService " + this.idTransportService + " running at time: "+ System.currentTimeMillis());
 				if (!singleCall) {
 					if (car.onFinalSpace()) {
 						System.out.println("{TS:37/initRoute} Carro está na edge final");
@@ -93,6 +93,7 @@ public class TransportService extends Thread {
 				System.out.println("{TS:89/initRoute} Vehicle " + car.getIdAuto() + " setRouteID at time: " + System.currentTimeMillis());
 
 				sumo.do_job_set(Vehicle.setSpeedMode(car.getIdAuto(), 31));
+				sumo.do_job_set(Vehicle.setSpeed(car.getIdAuto(), 80));
 				System.out.println("{TS:92/initRoute} Vehicle " + car.getIdAuto() + " setSpeedMode 31 at time: " + System.currentTimeMillis());
 				System.out.println("{TS:93/initRoute} Vehicle " + car.getIdAuto() + " initialized at time: " + System.currentTimeMillis());
 				

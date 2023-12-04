@@ -10,11 +10,13 @@ import java.util.concurrent.TimeUnit;
 
 public class Simulation extends Thread{
     private SumoTraciConnection sumo;
+	private long rate;
     private Company company;
     private AlphaBank alphaBank;
     private FuelStation fuelStation;
 
-    public Simulation(){
+    public Simulation(long rate){
+		this.rate = rate;
 		/* SUMO */
 		String sumo_bin = "sumo-gui";		
 		String config_file = "map/map.sumo.cfg";
@@ -39,7 +41,7 @@ public class Simulation extends Thread{
 			};
 
 			ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-        	scheduler.scheduleAtFixedRate(new PeriodicTask(), 1000, 500, TimeUnit.MILLISECONDS);
+        	scheduler.scheduleAtFixedRate(new PeriodicTask(), 1000, rate, TimeUnit.MILLISECONDS);
 
 			company = new Company(sumo);
 			company.join();

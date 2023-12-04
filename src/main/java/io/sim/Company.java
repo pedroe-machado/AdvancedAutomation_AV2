@@ -65,7 +65,7 @@ public class Company extends Thread{
         for (int i = 0; i < 1; i++) { // Contratação de Drivers e cadastro de novos carros
             try {
                 Car newCar = new Car(true, Integer.toString(i)+"0", new SumoColor(0, 255, 0, 126), Integer.toString(i), sumo,
-                        2000, 2, 2, 5.87, 5, 1);
+                        1000, 2, 2, 5.87, 5, 1);
                 carrosFirma.add(i, newCar);
                 System.out.println("{COMPANY:70} Carro " + Integer.toString(i)+"0" + " contratado.");
 
@@ -280,7 +280,7 @@ public class Company extends Thread{
                 if(resumedRoute){
                     //getFinishedAccess().add(Integer.parseInt(routeFinalizada.getId()),routeFinalizada);
                     repeat--;
-                    Excel.newSheet(100-repeat);
+                    //Excel.newSheet(100-repeat);
                 }
             } catch (NullPointerException e){
                 System.out.println("erro ao acessar lista");

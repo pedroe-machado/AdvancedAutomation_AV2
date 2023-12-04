@@ -102,8 +102,8 @@ public class Auto extends Thread {
 								System.nanoTime(), // Timestamp
 								sumoPosition2D.x, // posX
 								sumoPosition2D.y, // posY
-								(String) this.sumo.do_job_get(Vehicle.getRoadID(this.idAuto)), // actual edge
-								(String) this.sumo.do_job_get(Vehicle.getRouteID(this.idAuto)), // actual route
+								(String) sumo.do_job_get(Vehicle.getRoadID(this.idAuto)), // actual edge
+								(String) sumo.do_job_get(Vehicle.getRouteID(this.idAuto)), // actual route
 								(double) sumo.do_job_get(Vehicle.getSpeed(this.idAuto)), // speed
 								infoDistanceCompany, // traveled distance calculated from last step
 								(double) sumo.do_job_get(Vehicle.getFuelConsumption(this.idAuto)),
@@ -115,7 +115,8 @@ public class Auto extends Thread {
 								infoDistanceCompany);
 						this.drivingRepport.add(_repport);
 						
-						if(infoDistanceCompany<40) Excel.writeDataToExcel(_repport);
+						System.out.println(_repport.toString());
+						if(infoDistanceCompany<50) Excel.writeDataToExcel(_repport);
 						// graph.addData(_repport.getCo2Emission(), "CO2 Emission", "Time");
 
 						// sumo.do_job_set(Vehicle.setSpeedMode(this.idAuto, 0));

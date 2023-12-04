@@ -41,7 +41,7 @@ public class Client {
             } else {
                 messageBytes = message.getBytes();
             }
-            System.out.println("{CLIENT:44} ClientSentMessage: " + message + " - " + System.currentTimeMillis());
+            //System.out.println("{CLIENT:44} ClientSentMessage: " + message + " - " + System.currentTimeMillis());
             if(messageBytes!=null){
                 writer.write(messageBytes);
                 writer.flush();
