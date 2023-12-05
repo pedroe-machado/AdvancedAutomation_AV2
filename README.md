@@ -1,11 +1,18 @@
 Atividade Avaliativa - GAT108 - Automação Avançada
 Repositório do código submetido como resolução da segunda atividade avaliativa da disciplina.
 
+Este trabalho representa uma continuidade da proposta inicial de concepção de um sistema que visa a gestão em tempo real de informações de uma companhia de transporte. No contexto desta segunda avaliação, inicialmente concentrou-se na reconciliação dos dados provenientes da execução repetida de uma determinada rota, delineando um caminho para a unificação coerente dessas informações. E por fim, se propõe a explorar a análise de escalabilidade do sistema, particularmente focada na avaliação do desempenho multi-thread em execução com diferentes quantidades de núcleos operantes.
+	O processo percorrido na reconciliação dos dados, os conceitos e considerações, bem como na análise de escalabilidade serão melhor apresentados nas demais seções, no entanto se resume:
+
+Reconciliação de Dados: Um carro e uma rota foram eleitas para gerar um universo de medidas. A mesma rota foi percorrida 100 vezes, sendo submetida a variações aleatórias na escala de tráfego da simulação. A cada iteração do simulador, uma linha de informações era adicionada à planilha que armazenava os valores de tempo, posição, distância percorrida e velocidade do carro, além de outros dados contextuais. A partir dos dados obtidos, calcula-se os valores de Média, Polarização, Desvio padrão, Precisão e Incerteza que serão base para as análises estatísticas. São eleitos marcos em cada mudança de Edge que o carro atinge, onde se espera encontrar um tempo coerente e otimizado para que o carro percorra aquele trajeto. As equações de balanço são pautadas no tempo gasto entre Edges e o tempo total e, considerando que a distância percorrida entre Edges é estática, o balanço das velocidades médias por consequência deve ser satisfeito, possibilitando o ajuste orientado das condições de operação do carro para alcançar os resultados esperados. 
+
+Análise de Escalabilidade: O sistema a ser analisado é aquele implementado na primeira avaliação, portanto o funcionamento depende da interação de várias threads, cíclicas ou não. Dessa forma, é proposto usar o processo de atribuição das rotas como objeto de estudo e demonstrar a escalabilidade das tarefas que o compõem. O grafo de execução indica as prioridades de execução e dependências entre as tarefas. As alterações necessárias para a execução dessa segunda parte da avaliação foram realizadas em uma nova branch publicada no repositório do GitHub, denominada “scallabillity”, mantendo as duas formas de execução.
+
+
+Follow the steps to install and run:
 
 You need to install SUMO: https://eclipse.dev/sumo/
-
 You need to install Maven: https://maven.apache.org/
-
 You need to install VSCODE: https://code.visualstudio.com/download)https://code.visualstudio.com/download
 
 After that, use Maven commands using Terminal to install the dependencies found in the Pom.xml file (there are other ways to do this on the internet)
