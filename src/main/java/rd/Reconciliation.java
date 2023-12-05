@@ -34,7 +34,6 @@ public class Reconciliation {
 						}
 					}
 				}
-
 				this.varianceMatrix = new SimpleMatrix(aux_varianceMatrix);
 
 				SimpleMatrix aux1 = this.varianceMatrix.mult(this.incidenceMatrix.transpose());
@@ -45,10 +44,8 @@ public class Reconciliation {
 				this.reconciledFlowDouble = temp.getData();
 
 			} else {
-				System.out.println(
-						"the rawMeasurement and/or standardDeviation and/or incidenceMatrix have inconsistent data/size.");
+				System.out.println("the rawMeasurement and/or standardDeviation and/or incidenceMatrix have inconsistent data/size.");
 			}
-
 		} else {
 			System.out.println("the rawMeasurement and/or standardDeviation and/or incidenceMatrix have null data.");
 		}
@@ -152,4 +149,6 @@ public class Reconciliation {
 	public SimpleMatrix getWeightsArray() {
 		return this.weightsArray;
 	}
+
+	
 }
