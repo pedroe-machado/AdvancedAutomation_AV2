@@ -24,6 +24,7 @@ public class Driver extends Thread {
     private ArrayList<Route> done;
 
     public Driver(SumoTraciConnection sumo, String id, Car _car){
+        Out.writeLine("a_i Driver: "+ System.nanoTime());
         this.sumo = sumo;
         this.toDo = new ArrayList<>();
         this.done = new ArrayList<>();
@@ -33,11 +34,13 @@ public class Driver extends Thread {
 
     @Override
     public void run() {
+        Out.writeLine("r_i Driver: "+ System.nanoTime());
         Thread.currentThread().setName("Driver "+idDriver);
         System.out.println("{DRIVER:37} Driver iniciou em "+ System.currentTimeMillis());
         while (carro.isAlive()) {
             //System.out.println("{DRIVER:39} "+ idDriver + " Driver vivo " + System.currentTimeMillis());
             if(carro.theresNewRoute()){
+                Out.writeLine("s_t Driver: "+ System.nanoTime());
                 System.out.println("{DRIVER:40} "+ idDriver + " Recebeu rota em " + System.currentTimeMillis());
                 try {
                     done.add(Integer.parseInt(currentRoute.getId()), currentRoute); //adiciona rota finalizada
@@ -54,6 +57,7 @@ public class Driver extends Thread {
                 carro.ackNewRoute();
                 //Excel.doLine();
                 System.out.println("{DRIVER:54} "+ idDriver + " Iniciou nova rota: "+ currentRoute.getId() + " em " + System.currentTimeMillis());
+                Out.writeLine("c_t Driver: "+ System.nanoTime());
             }
             // while (!carro.doesNeedFuel() && !carro.theresNewRoute()) {
             //     try {

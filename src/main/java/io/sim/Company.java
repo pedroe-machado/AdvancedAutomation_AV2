@@ -38,6 +38,7 @@ public class Company extends Thread{
     private SumoTraciConnection sumo;
 
     public Company(SumoTraciConnection sumo) throws Exception{
+        Out.writeLine("a_i Company: " + System.nanoTime());
         this.sumo = sumo;
         this.carrosFirma = new ArrayList<>();
         this.server = new CompanyServer();
@@ -48,14 +49,17 @@ public class Company extends Thread{
         this.drivers = new ArrayList<Driver>();
 
         this.start();
+        Out.writeLine("r_i Company: " + System.nanoTime());
         System.out.println("{COMPANY:51} Company iniciado - " + System.currentTimeMillis());
     }
     
     @Override
     public void run() {
-
-        CreateRoutes createRoutes = new CreateRoutes();
-        createRoutes.start();
+        Out.writeLine("s_t Company: " + System.nanoTime());
+        
+        CreateRoutes createRoutes = new CreateRoutes(); Out.writeLine("a_i CreateRoutes: " + System.nanoTime());
+        createRoutes.start(); 
+        Out.writeLine("r_i CreateRoutes: " + System.nanoTime());
         try {
             createRoutes.join();
             this.avaliableRoutes = createRoutes.getRoutes();
@@ -77,13 +81,13 @@ public class Company extends Thread{
                 e.printStackTrace();
             }
         }
-        server.start();
+        server.start(); Out.writeLine("r_i Service: " + System.nanoTime());
 
         for (int i = 0; i <= carrosFirma.size()-1; i++) {
-            carrosFirma.get(i).start();
+            carrosFirma.get(i).start(); Out.writeLine("r_t Car: " + System.nanoTime());
             System.out.println("{COMPANY:84} Carro " + Integer.toString(i)+"0" + " iniciado. "+ System.currentTimeMillis());
 
-            drivers.get(i).start();
+            drivers.get(i).start(); Out.writeLine("r_t Driver: " + System.nanoTime());
             System.out.println("{COMPANY:87} Driver " + Integer.toString(i)+"0" + " iniciado. "+ System.currentTimeMillis());
             
             try {
@@ -92,6 +96,7 @@ public class Company extends Thread{
                 e.printStackTrace();
             }
         }
+        Out.writeLine("c_t Company: " + System.nanoTime());
     }
 
     /**
@@ -104,9 +109,11 @@ public class Company extends Thread{
 
         @Override
         public void run(){
+            Out.writeLine("s_t CreateRoutes: " + System.nanoTime());
             this.routes = parseRoutes();
             //limpaXml();
             System.out.println("{COMPANY:109} Rotas criadas com sucesso. "+ System.currentTimeMillis());
+            Out.writeLine("c_t CreateRoutes: " + System.nanoTime());
         }
         private Queue<Route> parseRoutes() {         
             Queue<Route> routesQueue = new LinkedList<>();
@@ -202,11 +209,13 @@ public class Company extends Thread{
         }
         @Override
         public Server CreateServerThread(Socket conn) {
+            Out.writeLine("a_i CompanyServer: " + System.nanoTime());
             return new ClientHandler(conn);
         }
     }
     private class ClientHandler extends Server {
         private Socket conn;
+        private int imprimiu=0;
 
         public ClientHandler(Socket conn) {
             super(conn);
@@ -214,6 +223,7 @@ public class Company extends Thread{
         }
         @Override
         protected void ProcessMessage(String messageReceived){
+            if (imprimiu == 0) Out.writeLine("s_t CompanyServer: " + System.nanoTime());
             try {                               
                 JSONObject jsonObject;
                 if (useEncryption) {
@@ -222,7 +232,7 @@ public class Company extends Thread{
                     jsonObject = new JSONObject(messageReceived);
                 }
                 if (jsonObject.getString("servico").equals("REQUEST_ROUTE")) {
-                    new ManageRoute(conn, jsonObject);
+                    new ManageRoute(conn, jsonObject); Out.writeLine("a_i ManageRoute: " + System.nanoTime());
                 } else if (jsonObject.getString("servico").equals("SEND_INFO")) {
                     new CalculaKm(jsonObject);
                 }
@@ -230,6 +240,7 @@ public class Company extends Thread{
                 System.out.println(messageReceived);
                 e.printStackTrace();
             }
+            if (imprimiu == 0) Out.writeLine("c_t CompanyServer: " + System.nanoTime()); imprimiu++;
         }
     }
 
@@ -263,7 +274,7 @@ public class Company extends Thread{
                 System.out.println("{COMPANY:264} Primeira rota");
                 resumedRoute = false;
             }
-            this.start();
+            this.start(); Out.writeLine("r_i ManageRoute: " + System.nanoTime());
         }
         private synchronized void reorganize(){
             Route auxRoute;
@@ -280,7 +291,8 @@ public class Company extends Thread{
                 if(resumedRoute){
                     //getFinishedAccess().add(Integer.parseInt(routeFinalizada.getId()),routeFinalizada);
                     repeat--;
-                    //Excel.newSheet(100-repeat);
+                    Excel.newSheet(100-repeat);
+                    System.out.println("Rotas restantes: "+ repeat);
                 }
             } catch (NullPointerException e){
                 System.out.println("erro ao acessar lista");
@@ -289,6 +301,7 @@ public class Company extends Thread{
 
         @Override
         public void run() {
+            Out.writeLine("s_t ManageRoute: " + System.nanoTime());
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
@@ -296,11 +309,12 @@ public class Company extends Thread{
             }
             if (repeat > 0) {
                 reorganize();
-                SendMessage(jsonRoute);
+                SendMessage(jsonRoute); Out.writeLine("a_i SendMessage: " + System.nanoTime());
             } else {
                 System.out.println("executou 100 vezes");
                 sumo.close();
             }
+            Out.writeLine("c_t ManageRoute: " + System.nanoTime());
         }
         @Override
         protected void ProcessMessage(String message) {

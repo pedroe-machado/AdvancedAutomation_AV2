@@ -15,7 +15,7 @@ public class TransportService extends Thread {
 
 	public TransportService(boolean _on_off, String _idTransportService, Car car,
 			SumoTraciConnection _sumo) {
-
+		Out.writeLine("a_i TransportService: " + System.nanoTime());
 		this.on_off = _on_off;
 		this.idTransportService = _idTransportService;
 		this.car = car;
@@ -25,6 +25,7 @@ public class TransportService extends Thread {
 
 	@Override
 	public void run() {
+		Out.writeLine("r_i TransportService: " + System.nanoTime());
 		System.out.println("{TS:26} TransportService " + this.idTransportService + " started at time: " + System.currentTimeMillis());
 		try {
 			this.initializeRoute();
@@ -51,6 +52,7 @@ public class TransportService extends Thread {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		Out.writeLine("c_t TransportService: " + System.nanoTime());
 	}
 
 	private void initializeRoute() {
