@@ -1,5 +1,6 @@
 package io.sim;
 
+import org.json.JSONObject;
 public class DrivingData {
 
 	/* SUMO's data */
@@ -162,6 +163,23 @@ public class DrivingData {
         this.lonL = (-75.0) + (_x_Position / (111320.0 * Math.cos(40.0 * (Math.PI / 180.0))));
 		this.distanciaCalculada = distanciaCalculada;
 
+	}
+
+	public JSONObject toJson() {
+		JSONObject json = new JSONObject();
+		json.put("autoID:", this.autoID);
+		json.put("timeStamp:", this.timeStamp);
+		json.put("x_Position:",x_Position);
+		
+		json.put("personCapacity:", this.personCapacity);
+		json.put("personNumber:", this.personNumber);
+		json.put("latL:", this.latL);
+		json.put("lonL:", this.lonL);
+		json.put("distanciaCalculada:", this.distanciaCalculada);
+		json.put("speed:", this.speed);
+		json.put("odometer:", this.odometer);
+		json.put("fuelConsumption:", this.fuelConsumption);
+		return json;
 	}
 
 	public double getLongitude(){
