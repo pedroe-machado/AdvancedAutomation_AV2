@@ -17,12 +17,15 @@ O sistema a ser analisado é aquele implementado na primeira avaliação, portan
 ### Follow the steps to install and run:
 
 > You need to install SUMO: https://eclipse.dev/sumo/
+
 > You need to install Maven: https://maven.apache.org/
+
 > You need to install VSCODE: https://code.visualstudio.com/download)https://code.visualstudio.com/download
 
 After that, use Maven commands using Terminal to install the dependencies found in the Pom.xml file (there are other ways to do this on the internet)
 
 Example of command using Terminal:
+
 `mvn install:install-file -Dfile="YOURPATH\vscode-workspace\sim\lib\libsumo-1.18.0.jar" -DgroupId="libsumo-1.18.0" -DartifactId="libsumo-1.18.0" -Dversion="libsumo-1.18.0" -Dpackaging="jar" -DgeneratePom=true`
 
 This command will enable what you can found in the Pom.xml file:
