@@ -34,10 +34,18 @@ public class Car extends Thread{
         this.idAuto = _idAuto;
         this.acquisitionRate = _acquisitionRate;
         this.abastecendo = false;
+        Out.writeLine("a_i Carro: "+ System.nanoTime());
 	}
     
     @Override
     public void run() {
+        int imprimiu = 0;
+        long time = System.nanoTime();
+        long lastTime = time;
+        Out.writeLine("s_t Carro: "+ time);
+        if(imprimiu==0) lastTime = time;
+        if(imprimiu==1) Out.writeLine("Periodo Carro: "+ (System.nanoTime()-lastTime));
+
         System.out.println("{CAR:40} Carro iniciou em "+ System.currentTimeMillis());
         try {
             new AskRoute(); //solicita rota e altera currentRoute
@@ -52,6 +60,7 @@ public class Car extends Thread{
 
         auto.start();
         while(true){
+            long period = System.nanoTime();
             try {
                 auto.esperaSensores();
                 //notificaRefresh();
@@ -71,7 +80,7 @@ public class Car extends Thread{
                     synchronized (resetLock) {
                         if (!theresNewRoute) {
                             System.out.println("{CAR:72} Esperando nova rota - "+ System.currentTimeMillis());
-                            try {
+                            try {   
                                 resetLock.wait();
                                 System.out.println("{CAR:75} Nova rota recebida - "+ System.currentTimeMillis());
                             } catch (Exception e) {
@@ -90,15 +99,17 @@ public class Car extends Thread{
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            
         }
+
     }
     
-    private void notificaRefresh(){
-        synchronized(monitorDriver){
-            refresh = true;
-            monitorDriver.notify();
-        }
-    }
+    // private void notificaRefresh(){
+    //     synchronized(monitorDriver){
+    //         refresh = true;
+    //         monitorDriver.notify();
+    //     }
+    // }
 
     public boolean askNewRoute() throws Exception{
         needNewRoute = true;
@@ -118,14 +129,19 @@ public class Car extends Thread{
         private Client clientComp;
         private JSONObject jsonFlag;
         private Route newRoute;
+        private int imprimiu = 0;
+        private long period;
 
         public AskRoute() throws UnknownHostException, IOException {
+            if(imprimiu==0) Out.writeLine("a_i AskRoute: "+ System.nanoTime()); period = System.nanoTime();
             this.clientComp = new Client("127.0.0.1", 20181);
             this.jsonFlag = new JSONObject();
             this.jsonFlag.put("servico", "REQUEST_ROUTE");
             this.start();
+            if(imprimiu==0) Out.writeLine("r_i AskRoute: "+ (System.nanoTime()));
         }
         public AskRoute(Route finished) throws UnknownHostException, IOException{
+            if(imprimiu==1) Out.writeLine("a_i AskRoute: "+ System.nanoTime()); period = System.nanoTime();
             this.clientComp = new Client("127.0.0.1", 20181);
             this.jsonFlag = new JSONObject();
             this.jsonFlag.put("servico", "REQUEST_ROUTE");
@@ -135,6 +151,7 @@ public class Car extends Thread{
         }
         @Override
         public void run() {
+            if(imprimiu==0) Out.writeLine("s_t AskRoute: "+ System.nanoTime());
             Thread.currentThread().setName("AskRoute");
             try {
                 clientComp.SendMessage(jsonFlag);
@@ -156,6 +173,8 @@ public class Car extends Thread{
                 System.out.println("aksroute com problema");
                 e.printStackTrace();
             }
+            if(imprimiu==0) {Out.writeLine("c_t AskRoute: "+ (System.nanoTime())); imprimiu++;}
+            if(imprimiu==1) Out.writeLine("Periodo AskRoute: "+ (System.nanoTime()-period)); imprimiu++;
         }
     }
     private class SendInfo extends Thread {

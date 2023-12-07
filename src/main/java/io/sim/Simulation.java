@@ -30,7 +30,7 @@ public class Simulation extends Thread{
 			e.printStackTrace();
 			System.out.println("Erro ao iniciar SUMO");
 		}
-
+		new Out("data/Log.txt");
     }
 
 	public void run() {

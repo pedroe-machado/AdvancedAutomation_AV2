@@ -1,5 +1,7 @@
 package io.sim;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
+
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
