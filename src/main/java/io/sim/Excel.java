@@ -18,27 +18,9 @@ public class Excel {
         workbook = new XSSFWorkbook();
         singleExcel = true;
         sheet = workbook.createSheet("0");
-        Row row = sheet.createRow(0);
-        int cellnum = 0;
-        row.createCell(cellnum++).setCellValue("TimeStamp");
-        row.createCell(cellnum++).setCellValue("AutoID");
-        row.createCell(cellnum++).setCellValue("RouteIDSUMO");
-        row.createCell(cellnum++).setCellValue("RoadIDSUMO");
-        row.createCell(cellnum++).setCellValue("Speed");
-        row.createCell(cellnum++).setCellValue("Odometer");
-        row.createCell(cellnum++).setCellValue("DistanciaCalculada");
-        row.createCell(cellnum++).setCellValue("FuelConsumption");
-        row.createCell(cellnum++).setCellValue("FuelType");
-        row.createCell(cellnum++).setCellValue("Co2Emission");
-        row.createCell(cellnum++).setCellValue("Longitude");
-        row.createCell(cellnum++).setCellValue("Latitude");
-        try (FileOutputStream out = new FileOutputStream(fileName)) {
-            workbook.write(out);
-            System.out.println("{EXCEL:37} Excel iniciado");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        cabecalho();
     }
+
     private static void cabecalho(){
         Row row = sheet.createRow(0);
         int cellnum = 0;
@@ -56,7 +38,7 @@ public class Excel {
         row.createCell(cellnum++).setCellValue("Latitude");
         try (FileOutputStream out = new FileOutputStream(fileName)) {
             workbook.write(out);
-            System.out.println("{EXCEL:37} Excel iniciado");
+            System.out.println("{EXCEL:41} Excel iniciado");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -70,8 +52,7 @@ public class Excel {
             int rownum = sheet.getLastRowNum() + 1;
 
             Row row = sheet.createRow(rownum);
-            //System.out.println("{EXCEL:58} "+ report.getAutoID() + " escrevendo linha " + rownum + " em " + System.currentTimeMillis());
-
+            
             int cellnum = 0;
             row.createCell(cellnum++).setCellValue(report.getTimeStamp());
             row.createCell(cellnum++).setCellValue(report.getAutoID());
@@ -88,7 +69,6 @@ public class Excel {
 
             try (FileOutputStream out = new FileOutputStream(fileName)) {
                 workbook.write(out);
-                //System.out.println("Dados gravados com sucesso no arquivo Excel!");
             } catch (IOException e) {
                 e.printStackTrace();
             }
